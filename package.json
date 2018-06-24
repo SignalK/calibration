@@ -1,0 +1,23 @@
+{
+  "name": "@signalk/calibration",
+  "version": "1.0.0",
+  "description": "Signal K Node Server plugin to alter incoming data based a set of calibration values",
+  "repository": "github:SignalK/calibration",
+  "main": "index.js",
+  "keywords": [
+    "signalk-node-server-plugin",
+    "signalk-webapp"
+  ],
+  "author": "Teppo Kurki <teppo.kurki@iki.fi>",
+  "scripts": {
+    "format": "prettier-standard 'index.js'"
+  },
+  "contributors": [],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "linear-interpolator": "^1.0.2"
+  },
+  "devDependencies": {
+    "prettier-standard": "^6.0.0"
+  }
+}

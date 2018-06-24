@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  .line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
+  }
+</style>
+
+<body>
+  <h1>Calibrations</h1>
+
+  <script src="d3.v4.min.js"></script>
+  <script>
+
+    var margin = { top: 20, right: 20, bottom: 30, left: 50 },
+      width = 960 - margin.left - margin.right,
+      height = 300 - margin.top - margin.bottom;
+
+
+    fetch('/plugins/calibration/config', {
+      credentials: 'include'
+    }).then(response => {
+      if (response.status != 200) {
+        throw new Error(response.status)
+      }
+      return response.json()
+    }).then(topConfig => {
+      topConfig.configuration.calibrations.forEach(calibration => {
+        d3.select("body").append('h2').text(calibration.path)
+        drawCorrectionGraph(calibration.mappings)
+      })
+    }).catch(err => {
+      window.alert('Could not get calibration configuration:' + err)
+    })
+
+    function getRanges(mappings) {
+      return mappings.reduce((acc, mapping) => {
+        acc.inMax = Math.max(acc.inMax, mapping.in)
+        acc.inMin = Math.min(acc.inMin, mapping.in)
+        acc.outMax = Math.max(acc.outMax, mapping.out - mapping.in)
+        acc.outMin = Math.min(acc.outMin, mapping.out - mapping.in)
+        return acc
+      }, {
+          inMax: Number.MIN_VALUE,
+          inMin: Number.MAX_VALUE,
+          outMax: Number.MIN_VALUE,
+          outMin: Number.MAX_VALUE
+        })
+    }
+
+    function drawCorrectionGraph(data) {
+      const ranges = getRanges(data)
+      const x = d3.scaleLinear().domain([ranges.inMin, ranges.inMax]).range([0, width])
+      const y = d3.scaleLinear().domain([ranges.outMin, ranges.outMax]).range([height, 0])
+
+      const svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")")
+
+      svg.append("g")
+        .attr("transform", "translate(0," + y(0) + ")")
+        .call(d3.axisBottom(x));
+      svg.append("g")
+        .call(d3.axisLeft(y));
+
+      const valueline = d3.line()
+        .x(d => x(d.in))
+        .y(d => y(d.out - d.in))
+      svg.append("path")
+        .data([data])
+        .attr("class", "line")
+        .attr("d", valueline);
+    }
+  </script>
+</body>
