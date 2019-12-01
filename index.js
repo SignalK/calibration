@@ -63,7 +63,7 @@ module.exports = function (app) {
         }
       })
       //always save on start so that the data is stored sorted
-      app.savePluginOptions(props)
+      app.savePluginOptions(props, () => {})
   }
 
   plugin.stop = function () {}
