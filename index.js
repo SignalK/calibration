@@ -41,14 +41,21 @@ module.exports = function (app) {
               return acc
             }, [])
           )
+          let compareSource = () => true
+          if (typeof calibration.sourceRef !== 'undefined') {
+            compareSource = (sourceRef) => sourceRef === calibration.sourceRef
+          }
           unsubscribes.push(
             app.registerDeltaInputHandler((delta, next) => {
               delta.updates &&
                 delta.updates.forEach(update => {
                   update.values &&
                     update.values.forEach(pathValue => {
-                      if (pathValue.path === calibration.path) {
+                      if (pathValue.path === calibration.path && compareSource(update.$source)) {
                         const result = convert(pathValue.value)
+                        if (debug.enabled) {
+                          debug(`${pathValue.path}(${update.$source}) ${pathValue.value} => ${result})`)
+                        }
                         lastConversions[calibration.path] = {
                           in: pathValue.value,
                           out: result
@@ -89,6 +96,9 @@ module.exports = function (app) {
           required: ['path', 'mappings'],
           properties: {
             path: {
+              type: 'string'
+            },
+            sourceRef: {
               type: 'string'
             },
             period: {
