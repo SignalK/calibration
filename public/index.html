@@ -28,7 +28,7 @@
       return response.json()
     }).then(topConfig => {
       topConfig.configuration.calibrations.forEach(calibration => {
-        d3.select("body").append('h2').text(calibration.path)
+        d3.select("body").append('h2').text(`${calibration.path} ${calibration.sourceRef ? calibration.sourceRef : ''}`)
         drawCorrectionGraph(calibration.mappings)
       })
     }).catch(err => {
