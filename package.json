@@ -10,7 +10,8 @@
   ],
   "author": "Teppo Kurki <teppo.kurki@iki.fi>",
   "scripts": {
-    "format": "prettier-standard 'index.js'"
+    "format": "prettier-standard 'index.js'",
+    "test": "mocha"
   },
   "contributors": [],
   "license": "Apache-2.0",
@@ -18,6 +19,8 @@
     "linear-interpolator": "^1.0.2"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1",
     "prettier-standard": "^6.0.0"
   }
 }

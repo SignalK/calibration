@@ -33,11 +33,23 @@ module.exports = function (app) {
   plugin.start = function (props) {
     props.calibrations &&
       props.calibrations.forEach(calibration => {
-        calibration.mappings.sort((a,b) => a.in - b.in)
         if (calibration.mappings.length > 1) {
+          calibration.mappings.sort((a, b) => a.in - b.in)
+
+          const period = parseFloat(calibration.period)
+          debug(`path:${calibration.path} sourceRef:${calibration.sourceRef} period:${calibration.period}`)
+
+          let previousOut = Number.MIN_VALUE
           const convert = linearInterpolator(
             calibration.mappings.reduce((acc, mapping) => {
-              acc.push([mapping.in, mapping.out])
+              let out = mapping.out
+              if (!isNaN(period) && out < previousOut) {
+                out += (Math.floor(previousOut / period) + 1) * period
+              }
+
+              debug(`${mapping.in} => ${out}(${mapping.out})`)
+              acc.push([mapping.in, out])
+              previousOut = out
               return acc
             }, [])
           )
@@ -52,13 +64,16 @@ module.exports = function (app) {
                   update.values &&
                     update.values.forEach(pathValue => {
                       if (pathValue.path === calibration.path && compareSource(update.$source)) {
-                        const result = convert(pathValue.value)
-                        if (debug.enabled) {
-                          debug(`${pathValue.path}(${update.$source}) ${pathValue.value} => ${result})`)
+                        let result = convert(pathValue.value)
+                        if (!isNaN(period)) {
+                          result = (result / period) % 1 * period
                         }
                         lastConversions[calibration.path] = {
                           in: pathValue.value,
                           out: result
+                        }
+                        if (debug.enabled) {
+                          debug(`${pathValue.path}(${update.$source}) ${pathValue.value} => ${result})`)
                         }
                         pathValue.value = result
                       }
@@ -69,11 +84,11 @@ module.exports = function (app) {
           )
         }
       })
-      //always save on start so that the data is stored sorted
-      app.savePluginOptions(props, () => {})
+    //always save on start so that the data is stored sorted
+    app.savePluginOptions(props, () => { })
   }
 
-  plugin.stop = function () {}
+  plugin.stop = function () { }
 
   plugin.statusMessage = function () {
     return Object.keys(lastConversions)
