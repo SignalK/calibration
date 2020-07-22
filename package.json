@@ -1,6 +1,6 @@
 {
   "name": "@signalk/calibration",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Signal K Node Server plugin to alter incoming data based a set of calibration values",
   "repository": "github:SignalK/calibration",
   "main": "index.js",
