@@ -40,16 +40,18 @@ module.exports = function (app) {
           debug(`path:${calibration.path} sourceRef:${calibration.sourceRef} period:${calibration.period}`)
 
           let previousOut = Number.MIN_VALUE
+          let cycleCount = 0
           const convert = linearInterpolator(
             calibration.mappings.reduce((acc, mapping) => {
               let out = mapping.out
               if (!isNaN(period) && out < previousOut) {
-                out += (Math.floor(previousOut / period) + 1) * period
+                cycleCount += Math.floor((previousOut - out)/ period) + 1
+                out += cycleCount * period
               }
 
-              debug(`${mapping.in} => ${out}(${mapping.out})`)
+              debug(`${mapping.in};${out};${mapping.out}`)
               acc.push([mapping.in, out])
-              previousOut = out
+              previousOut = mapping.out
               return acc
             }, [])
           )

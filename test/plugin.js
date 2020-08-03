@@ -1,5 +1,7 @@
 const expect = require('chai').expect
 
+const Plugin = require('../')
+
 describe('Plugin ', () => {
   it('period works for over period boundary values', (done) => {
     let handler
@@ -7,7 +9,7 @@ describe('Plugin ', () => {
       savePluginOptions: () => { },
       registerDeltaInputHandler: (f) => handler = f
     }
-    const plugin = require('../')(app)
+    const plugin = Plugin(app)
     const options = {
       calibrations: [
         {
@@ -33,6 +35,32 @@ describe('Plugin ', () => {
       expect(handledDelta.updates[0].values[0].value).to.be.closeTo(0.2, 0.0001)
       done()
     })
-
   })
+
+  it('works with real world config file', (done) => {
+    let handler
+    const app = {
+      savePluginOptions: () => { },
+      registerDeltaInputHandler: (f) => handler = f
+    }
+    const plugin = Plugin(app)
+
+    plugin.start(require('./calibration.json').configuration)
+    const delta = {
+      updates: [
+        {
+          $source: 'calypso.HC',
+          values: [
+            {
+              path: 'navigation.headingMagnetic',
+              value: 4.1
+            }]
+        }]
+    }
+    handler(delta, (handledDelta) => {
+      expect(handledDelta.updates[0].values[0].value).to.be.closeTo(2.5822, 0.0001)
+      done()
+    })
+  })
+
 })
