@@ -10,6 +10,7 @@ export default (props) => {
   calibrationsToRender.push({
     path: '',
     sourceRef: '',
+    decimals: '',
     period: '',
     mappings: []
   })
@@ -41,6 +42,7 @@ const labelStyle = {
 const Calibration = (props) => {
   const [path, setPath] = useState(props.path)
   const [sourceRef, setSourceRef] = useState(props.sourceRef)
+  const [decimals, setDecimals] = useState(props.decimals)
   const [period, setPeriod] = useState(props.period)
   const [mappings, setMappings] = useState(props.mappings)
 
@@ -64,6 +66,12 @@ const Calibration = (props) => {
                 setter={setSourceRef}
                 text='Specify source if needed, leave empty otherwise. Sources are available in Data Browser.' />
               <FormField
+                fieldName='decimals'
+                label='Decimals'
+                value={decimals}
+                setter={setDecimals}
+                text='Specify number of decimals if you want the results to be rounded, leave empty otherwise.' />
+              <FormField
                 fieldName='period'
                 label='Period'
                 value={period}
@@ -83,6 +91,7 @@ const Calibration = (props) => {
                         props.save({
                           path,
                           sourceRef,
+                          decimals,
                           period,
                           mappings
                         })
