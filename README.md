@@ -13,8 +13,8 @@ The units in Signal K are SI units, so for example angles are in radians.
 ![image](https://user-images.githubusercontent.com/1049678/100268587-ef688300-2f5d-11eb-9b5e-4358af94d110.png)
 
 Build instructions:
-git clone git@github.com:SignalK/calibration.git
+```git clone git@github.com:SignalK/calibration.git
 cd calibration
 npm install && npm run build
-npm run dev
+npm run dev```
 
