@@ -37,7 +37,8 @@ module.exports = function (app) {
           calibration.mappings.sort((a, b) => a.in - b.in)
 
           const period = parseFloat(calibration.period)
-          debug(`path:${calibration.path} sourceRef:${calibration.sourceRef} period:${calibration.period}`)
+          const decimals = parseInt(calibration.decimals)
+          debug(`path:${calibration.path} sourceRef:${calibration.sourceRef} decimals: ${calibration.decimals}, period:${calibration.period}`)
 
           let previousOut = Number.MIN_VALUE
           const convert = linearInterpolator(
@@ -68,12 +69,16 @@ module.exports = function (app) {
                         if (!isNaN(period)) {
                           result = (result / period) % 1 * period
                         }
+                        let calibrated = result
+                        if (!isNaN(decimals)){
+                          result = parseFloat(result.toFixed(decimals))
+                        }
                         lastConversions[calibration.path] = {
                           in: pathValue.value,
                           out: result
                         }
                         if (debug.enabled) {
-                          debug(`${pathValue.path}(${update.$source}) ${pathValue.value} => ${result})`)
+                          debug(`${pathValue.path}(${update.$source}) ${pathValue.value} => ${result} (${calibrated}))`)
                         }
                         pathValue.value = result
                       }
@@ -115,6 +120,9 @@ module.exports = function (app) {
             },
             sourceRef: {
               type: 'string'
+            },
+            decimals: {
+              type: 'number'
             },
             period: {
               type: 'number'
