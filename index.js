@@ -54,7 +54,7 @@ module.exports = function (app) {
             }, [])
           )
           let compareSource = () => true
-          if (typeof calibration.sourceRef !== 'undefined') {
+          if (typeof calibration.sourceRef !== 'undefined' && calibration.sourceRef.trim() !== '') {
             compareSource = (sourceRef) => sourceRef === calibration.sourceRef
           }
           unsubscribes.push(
