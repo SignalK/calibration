@@ -44,11 +44,7 @@ module.exports = function (app) {
           let previousOut = Number.MIN_VALUE
           const convert = linearInterpolator(
             calibration.mappings.reduce((acc, mapping) => {
-              let out = mapping.out
-              if (!isNaN(period) && out < previousOut) {
-                out += (Math.floor(previousOut / period) + 1) * period
-              }
-
+              const out = mapping.out
               debug(`${mapping.in} => ${out}(${mapping.out})`)
               acc.push([mapping.in, out])
               previousOut = out
