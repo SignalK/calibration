@@ -37,7 +37,9 @@ module.exports = function (app) {
           calibration.mappings.sort((a, b) => a.in - b.in)
 
           const period = parseFloat(calibration.period)
-          debug(`path:${calibration.path} sourceRef:${calibration.sourceRef} period:${calibration.period}`)
+          debug(
+            `path:${calibration.path} sourceRef:${calibration.sourceRef} period:${calibration.period}`
+          )
 
           let previousOut = Number.MIN_VALUE
           const convert = linearInterpolator(
@@ -54,8 +56,11 @@ module.exports = function (app) {
             }, [])
           )
           let compareSource = () => true
-          if (typeof calibration.sourceRef !== 'undefined' && calibration.sourceRef.trim() !== '') {
-            compareSource = (sourceRef) => sourceRef === calibration.sourceRef
+          if (
+            typeof calibration.sourceRef !== 'undefined' &&
+            calibration.sourceRef.trim() !== ''
+          ) {
+            compareSource = sourceRef => sourceRef === calibration.sourceRef
           }
           unsubscribes.push(
             app.registerDeltaInputHandler((delta, next) => {
@@ -63,17 +68,22 @@ module.exports = function (app) {
                 delta.updates.forEach(update => {
                   update.values &&
                     update.values.forEach(pathValue => {
-                      if (pathValue.path === calibration.path && compareSource(update.$source)) {
+                      if (
+                        pathValue.path === calibration.path &&
+                        compareSource(update.$source)
+                      ) {
                         let result = convert(pathValue.value)
                         if (!isNaN(period)) {
-                          result = (result / period) % 1 * period
+                          result = ((result / period) % 1) * period
                         }
                         lastConversions[calibration.path] = {
                           in: pathValue.value,
                           out: result
                         }
                         if (debug.enabled) {
-                          debug(`${pathValue.path}(${update.$source}) ${pathValue.value} => ${result})`)
+                          debug(
+                            `${pathValue.path}(${update.$source}) ${pathValue.value} => ${result})`
+                          )
                         }
                         pathValue.value = result
                       }
@@ -84,15 +94,18 @@ module.exports = function (app) {
           )
         }
       })
-    //always save on start so that the data is stored sorted
-    app.savePluginOptions(props, () => { })
+    // always save on start so that the data is stored sorted
+    app.savePluginOptions(props, () => {})
   }
 
-  plugin.stop = function () { }
+  plugin.stop = function () {}
 
   plugin.statusMessage = function () {
     return Object.keys(lastConversions)
-      .map(key => `${key}: ${lastConversions[key].in} => ${lastConversions[key].out}`)
+      .map(
+        key =>
+          `${key}: ${lastConversions[key].in} => ${lastConversions[key].out}`
+      )
       .toString()
   }
 
