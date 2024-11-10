@@ -45,7 +45,7 @@
     "reactstrap": "^5.0.0",
     "recharts": "^1.8.5",
     "redux": "^3.7.2",
-    "redux-thunk": "^2.3.0",
+    "redux-thunk": "2.3.0",
     "simple-line-icons": "^2.5.5",
     "style-loader": "^2.0.0",
     "webpack": "^5.0.0",
